@@ -1,0 +1,84 @@
+import'package:flutter/material.dart';
+
+import'dart:convert' as convert;
+
+void main() {
+  runApp( BookApp());
+}
+
+class BookApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context){
+    return MaterialApp(
+   theme:ThemeData(
+     primarySwatch:Colors.amber,
+     inputDecorationTheme: const InputDecorationTheme(
+       border:OutlineInputBorder(
+       borderRadius:BorderRadius.all(Radius.circular(50))
+       ),
+      ),
+     ),
+     home: const HomePage(),
+    );
+  }
+}
+
+
+
+class HomePage extends StatefulWidget {
+  const HomePage({key?key}): super(key:key);
+  
+  @override
+  _HomePageState createState()=>_HomeState();
+}
+
+class_HomePage extends State<HomePage>{
+  final_controller=TextEditingController();
+  var titulo = "";
+  var itemCount = 0;
+  
+  void_buscarLivros()async{
+    titulo=_controller.text;
+    final url=Uri.https(
+     'www.googleapis.com',
+      '/books/v1/volume',
+      {'q':'{$titulo}'},
+     );
+    
+    final response = await http.get(url);
+    
+    if (response.statuscode==200){
+      final jsonResponse = convert.jsonDecode(response.body);
+      itemCount = jsonResponse ['totalltems'];
+      print('Number of books about $titulo:$itemCount.');
+      setState((){});
+    }else {
+     print('request failed with status:${response.statusCode}.');
+    }
+  }
+  
+  @override
+  widget build(BuildContext context) {
+    return Scaffold(
+      body: padding(
+        padding:const EdgeInsets.all(16),
+        child: ListView(
+          TextField(
+          controller:_controller),
+          const SivedBox(height:16),
+          ElevateButton.icon(
+            onPressed:_buscarLivros,
+            icon:const Icon(Icons.search),
+            label:const Text('Pesquisar')),
+          const SizedBox(height:16),
+          Text(
+            'Foram encontrados $itemCount livros sobre $titulo',
+            style:Theme.of(context).textTheme.headline4,
+           ),
+          ],
+         ),
+        ),
+      );
+  }
+}
+    
